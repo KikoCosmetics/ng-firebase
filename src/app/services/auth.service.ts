@@ -20,19 +20,13 @@ import {
     Firestore
 } from "firebase/firestore";
 import {FirebaseApp, FirebaseOptions, initializeApp} from "firebase/app";
+import {environment} from "../../environments/environment";
 
 @Injectable()
 export class AuthService {
 
     get config(): FirebaseOptions {
-        return {
-            apiKey: "AIzaSyBwkpfDQdLYLH9J7jZNSSJPOHiCncGnjW8",
-            authDomain: "kiko-login-tests.firebaseapp.com",
-            projectId: "kiko-login-tests",
-            storageBucket: "kiko-login-tests.appspot.com",
-            messagingSenderId: "801479242798",
-            appId: "1:801479242798:web:d445135028433c0c1e5bbf"
-        };
+        return environment.firebaseConfigs.gcp;
     }
 
     get loginStatus() {
