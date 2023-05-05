@@ -1,19 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {AuthService} from "../../services/auth.service";
+
+interface SignupForm {
+    user: FormControl<string>;
+    pwd: FormControl<string>;
+}
 
 @Component({
-  selector: 'app-sign-up',
-  templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.css']
+    selector: "app-sign-up",
+    templateUrl: "./sign-up.component.html",
+    styleUrls: ["./sign-up.component.css"]
 })
 export class SignUpComponent implements OnInit {
 
-  constructor() { }
+    signupForm: FormGroup<SignupForm> = this._formBuilder.group({
+        user: [""],
+        pwd: [""]
+    });
 
-  ngOnInit() {
-  }
+    constructor(private readonly _authSrv: AuthService,
+                private readonly _formBuilder: FormBuilder) {
+    }
 
-  register(): void {
-    
-  }
+    ngOnInit() {
+    }
+
+    register(): void {
+        const formValue = this.signupForm.value;
+        console.info("SUBMIT", formValue);
+        this._authSrv.signUpUser(formValue.user, formValue.pwd);
+    }
 
 }
