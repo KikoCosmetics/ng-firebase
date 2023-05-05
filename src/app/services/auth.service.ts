@@ -19,14 +19,21 @@ import {
     addDoc,
     Firestore
 } from "firebase/firestore";
+import {
+    AppCheck,
+    initializeAppCheck,
+    ReCaptchaEnterpriseProvider
+} from "firebase/app-check";
 import {FirebaseApp, FirebaseOptions, initializeApp} from "firebase/app";
 import {environment} from "../../environments/environment";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class AuthService {
 
     get config(): FirebaseOptions {
-        return environment.firebaseConfigs.gcp;
+        return environment.firebaseConfigs.free;
     }
 
     get loginStatus() {
@@ -36,6 +43,7 @@ export class AuthService {
     }
 
     private _app: FirebaseApp = initializeApp(this.config);
+    private _appCheck: AppCheck;
     private _auth: Auth;
 
     private _loggedInStatus = JSON.parse(
@@ -44,6 +52,10 @@ export class AuthService {
 
     constructor() {
         this._auth = getAuth(this._app);
+        this._appCheck = initializeAppCheck(this._app, {
+            provider: new ReCaptchaEnterpriseProvider(environment.recaptchaConfigs.free.key),
+            isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
+        });
     }
 
     setLoginStatus(value: boolean) {

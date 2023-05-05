@@ -15,8 +15,8 @@ interface SignupForm {
 export class SignUpComponent implements OnInit {
 
     signupForm: FormGroup<SignupForm> = this._formBuilder.group({
-        user: [""],
-        pwd: [""]
+        user: ["otaconkiko+codeflow1@gmail.com"],
+        pwd: ["123456789"]
     });
 
     constructor(private readonly _authSrv: AuthService,

@@ -2,6 +2,14 @@ import {FirebaseOptions} from "firebase/app";
 
 export const environment = {
   production: false,
+  recaptchaConfigs: {
+    free: {
+      key: "6LcPqOUlAAAAACJqr5yJaT56VndX7gGzfQFcBF9m"
+    },
+    gcp: {
+      key: ""
+    }
+  },
   firebaseConfigs: {
     free: {
       apiKey: "AIzaSyBwkpfDQdLYLH9J7jZNSSJPOHiCncGnjW8",
