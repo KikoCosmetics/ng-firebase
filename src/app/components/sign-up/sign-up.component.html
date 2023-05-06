@@ -22,9 +22,25 @@
 			<!-- Calling SignIn Api from AuthService -->
 			<div class="formGroup">
 				<button type="button"
+						[disabled]="showSpinner"
+						(click)="signIn()"
+						[class.disabled]="showSpinner"
+						class="btn btnPrimary">
+					Login
+				</button>
+				<button type="button"
+						[disabled]="showSpinner"
 						(click)="register()"
+						[class.disabled]="showSpinner"
 						class="btn btnPrimary">
 					Register
+				</button>
+				<button type="button"
+						[disabled]="!user"
+						(click)="delete()"
+						[class.disabled]="showSpinner"
+						class="btn btnPrimary">
+					Delete
 				</button>
 			</div>
 		</div>

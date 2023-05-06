@@ -4,7 +4,7 @@ export const environment = {
   production: false,
   recaptchaConfigs: {
     free: {
-      key: "6LcPqOUlAAAAACJqr5yJaT56VndX7gGzfQFcBF9m"
+      key: "6LcVR-YlAAAAAAEH8itn6NrsWkfG0dBBssQHTtZz"
     },
     gcp: {
       key: ""

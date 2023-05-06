@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {AppCheckOptions} from "@firebase/app-check";
 import {
     GoogleAuthProvider,
     getAuth,
@@ -8,7 +9,9 @@ import {
     sendPasswordResetEmail,
     signOut,
     Auth,
-    UserCredential
+    UserCredential,
+    User,
+    deleteUser
 } from "firebase/auth";
 import {
     getFirestore,
@@ -22,7 +25,7 @@ import {
 import {
     AppCheck,
     initializeAppCheck,
-    ReCaptchaEnterpriseProvider
+    ReCaptchaV3Provider
 } from "firebase/app-check";
 import {FirebaseApp, FirebaseOptions, initializeApp} from "firebase/app";
 import {environment} from "../../environments/environment";
@@ -53,9 +56,17 @@ export class AuthService {
     constructor() {
         this._auth = getAuth(this._app);
         this._appCheck = initializeAppCheck(this._app, {
-            provider: new ReCaptchaEnterpriseProvider(environment.recaptchaConfigs.free.key),
-            isTokenAutoRefreshEnabled: true // Set to true to allow auto-refresh.
-        });
+            provider: new ReCaptchaV3Provider(environment.recaptchaConfigs.free.key),
+
+            // Optional argument. If true, the SDK automatically refreshes App Check
+            // tokens as needed.
+            isTokenAutoRefreshEnabled: true
+        } as AppCheckOptions);
+
+    }
+
+    deleteUser(user: User): Promise<void> {
+        return deleteUser(user);
     }
 
     setLoginStatus(value: boolean) {
