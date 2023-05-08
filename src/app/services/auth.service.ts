@@ -1,27 +1,19 @@
 import {Injectable} from "@angular/core";
 import {AppCheckOptions} from "@firebase/app-check";
 import {
+    AuthProvider,
     GoogleAuthProvider,
     getAuth,
     signInWithPopup,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    onAuthStateChanged,
     sendPasswordResetEmail,
+    beforeAuthStateChanged,
     signOut,
     Auth,
-    UserCredential,
-    User,
-    deleteUser
+    User
 } from "firebase/auth";
-import {
-    getFirestore,
-    query,
-    getDocs,
-    collection,
-    where,
-    addDoc,
-    Firestore
-} from "firebase/firestore";
 import {
     AppCheck,
     initializeAppCheck,
@@ -39,47 +31,65 @@ export class AuthService {
         return environment.firebaseConfigs.free;
     }
 
-    get loginStatus() {
-        return JSON.parse(
-            localStorage.getItem("loggedIn") || this._loggedInStatus.toString()
-        );
+    get loggedUser(): User | void {
+        return this.#loggedUser;
     }
 
-    private _app: FirebaseApp = initializeApp(this.config);
-    private _appCheck: AppCheck;
-    private _auth: Auth;
-
-    private _loggedInStatus = JSON.parse(
-        localStorage.getItem("loggedIn") || "false"
-    );
+    readonly #app: FirebaseApp = initializeApp(this.config);
+    readonly #appCheck: AppCheck;
+    readonly #auth: Auth;
+    readonly #googleProvider: GoogleAuthProvider = new GoogleAuthProvider();
+    #loggedUser: User;
+    readonly #restrictedError: string = "auth/admin-restricted-operation";
 
     constructor() {
-        this._auth = getAuth(this._app);
-        this._appCheck = initializeAppCheck(this._app, {
+        this.#auth = getAuth(this.#app);
+        this.#appCheck = initializeAppCheck(this.#app, {
             provider: new ReCaptchaV3Provider(environment.recaptchaConfigs.free.key),
-
-            // Optional argument. If true, the SDK automatically refreshes App Check
-            // tokens as needed.
             isTokenAutoRefreshEnabled: true
         } as AppCheckOptions);
-
+        this.#watchAuthState;
     }
 
-    deleteUser(user: User): Promise<void> {
-        return deleteUser(user);
-    }
+    async signInWithGoogle(): Promise<User> {
+        return this.#signInWithProvider(this.#googleProvider)
+            .catch(err => {
+                console.info("SOCIAL SIGNIN ERROR", err);
+                // The user is not yet registered
+                if (err.code === this.#restrictedError) {
+                    const credential = GoogleAuthProvider.credentialFromError(err);
+                    console.info("SOCIAL SIGNIN CREDENTIAL USED", {
+                        credential,
+                        customData: err.customData
+                    });
+                }
 
-    setLoginStatus(value: boolean) {
-        this._loggedInStatus = value;
-        localStorage.setItem("loggedIn", "true");
+                throw new Error("socialSignInError");
+            });
     }
 
     signUpUser(email: string, password: string) {
-        return createUserWithEmailAndPassword(this._auth, email, password);
+        return createUserWithEmailAndPassword(this.#auth, email, password);
     }
 
     signInUser(email: string, password: string) {
-        return signInWithEmailAndPassword(this._auth, email, password);
+        return signInWithEmailAndPassword(this.#auth, email, password);
     }
 
+    signOut(): Promise<void> {
+        return signOut(this.#auth);
+    }
+
+    // private
+
+    async #signInWithProvider<T extends AuthProvider = AuthProvider>(provider: T): Promise<User> {
+        return signInWithPopup(this.#auth, provider)
+            .then((userCredential) => userCredential.user);
+    }
+
+    #watchAuthState(): void {
+        onAuthStateChanged(this.#auth, (user: User | null) => {
+            this.#loggedUser = user || void 0;
+        });
+    }
 }

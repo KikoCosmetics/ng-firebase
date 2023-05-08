@@ -23,6 +23,13 @@
 			<div class="formGroup">
 				<button type="button"
 						[disabled]="showSpinner"
+						(click)="signInWithGoogle()"
+						[class.disabled]="showSpinner"
+						class="btn btnPrimary">
+					Sign in with Google
+				</button>
+				<button type="button"
+						[disabled]="showSpinner"
 						(click)="signIn()"
 						[class.disabled]="showSpinner"
 						class="btn btnPrimary">

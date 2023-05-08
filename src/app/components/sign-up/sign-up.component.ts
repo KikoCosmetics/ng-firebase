@@ -65,6 +65,22 @@ export class SignUpComponent implements OnInit {
             });
     }
 
+    signInWithGoogle(): void {
+        console.info("");
+        this.showSpinner = !0;
+        from(this._authSrv.signInWithGoogle())
+            .pipe(finalize(() => this.showSpinner = !1))
+            .subscribe({
+                next: (user) => {
+                    console.info("LOGIN OK!", user);
+                    this.user = user;
+                },
+                error: (e) => {
+                    console.warn("LOGIN KO!", e);
+                }
+            });
+    }
+
     register(): void {
         this.showSpinner = !0;
         const formValue = this.signupForm.value;
